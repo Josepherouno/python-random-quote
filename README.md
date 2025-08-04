@@ -2,6 +2,9 @@
 
 Shinexa is a Telegram mini game that chats with users and replies using an AI-generated female voice from OpenAI's text-to-speech model. It transcribes incoming voice notes to keep the conversation fluid without storing personal data.
 
+## Try it
+Play the demo bot on Telegram: [t.me/ShineQuest25Bot?game=ShineQuest](https://t.me/ShineQuest25Bot?game=ShineQuest).
+
 ## Features
 - Send text or voice messages and get spoken responses
 - Interactive conversations powered by ChatGPT
