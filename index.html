@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Shinexa</title>
+  <style>
+    body { font-family: sans-serif; margin: 2em; }
+    #chat { border: 1px solid #aaa; padding: 1em; max-width: 400px; height: 300px; overflow-y: auto; }
+    #input { width: 300px; margin-right: 0.5em; }
+  </style>
+</head>
+<body>
+  <h1>Shinexa</h1>
+  <div id="chat"></div>
+  <input id="input" placeholder="Type message..." />
+  <button id="send">Send</button>
+  <script>
+    const chatDiv = document.getElementById('chat');
+    const inputEl = document.getElementById('input');
+    const sendBtn = document.getElementById('send');
+
+    function appendMessage(sender, text) {
+      const p = document.createElement('p');
+      p.textContent = `${sender}: ${text}`;
+      chatDiv.appendChild(p);
+      chatDiv.scrollTop = chatDiv.scrollHeight;
+    }
+
+    function speak(text, voiceName='Google UK English Female') {
+      const utterance = new SpeechSynthesisUtterance(text);
+      const voices = window.speechSynthesis.getVoices();
+      const voice = voices.find(v => v.name === voiceName);
+      if (voice) utterance.voice = voice;
+      window.speechSynthesis.speak(utterance);
+    }
+
+    async function sendMessage() {
+      const userText = inputEl.value.trim();
+      if (!userText) return;
+      appendMessage('You', userText);
+      inputEl.value = '';
+
+      // Replace this with a real backend call
+      const botResponse = 'You said: ' + userText;
+      appendMessage('Bot', botResponse);
+      speak(botResponse);
+    }
+
+    sendBtn.addEventListener('click', sendMessage);
+    inputEl.addEventListener('keypress', e => {
+      if (e.key === 'Enter') sendMessage();
+    });
+
+    window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+  </script>
+</body>
+</html>
