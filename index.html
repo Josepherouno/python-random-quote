@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Shinexa</title>
+  <style>
+    body { font-family: sans-serif; margin: 2em; }
+    #chat { border: 1px solid #aaa; padding: 1em; max-width: 400px; height: 300px; overflow-y: auto; }
+  </style>
+</head>
+<body>
+  <h1>Shinexa</h1>
+  <div id="chat"></div>
+  <button id="mic">🎤 Talk to Shinexa</button>
+  <script>
+    const chatDiv = document.getElementById('chat');
+    const micBtn = document.getElementById('mic');
+
+    function appendMessage(sender, text) {
+      const p = document.createElement('p');
+      p.textContent = `${sender}: ${text}`;
+      chatDiv.appendChild(p);
+      chatDiv.scrollTop = chatDiv.scrollHeight;
+    }
+
+    function speak(text, voiceName = 'Google UK English Female', onend) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      const voices = window.speechSynthesis.getVoices();
+      const voice = voices.find(v => v.name === voiceName);
+      if (voice) utterance.voice = voice;
+      if (onend) utterance.onend = onend;
+      window.speechSynthesis.speak(utterance);
+    }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognizer = new SpeechRecognition();
+    recognizer.lang = 'en-US';
+    recognizer.onresult = async event => {
+      const transcript = event.results[0][0].transcript;
+      appendMessage('You', transcript);
+      const res = await fetch('/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: transcript })
+      });
+      const data = await res.json();
+      appendMessage('Shinexa', data.response);
+      speak(data.response, 'Google UK English Female', () => {
+        recognizer.start();
+      });
+    };
+
+    micBtn.addEventListener('click', () => {
+      speak("Hello! I'm Shinexa. Talk to me.", 'Google UK English Female', () => {
+        recognizer.start();
+      });
+    });
+
+    window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+  </script>
+</body>
+</html>
