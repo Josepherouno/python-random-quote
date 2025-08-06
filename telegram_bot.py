@@ -34,7 +34,19 @@ def chatgpt_reply(prompt: str) -> str:
         model="gpt-4o-mini",
         messages=[{"role": "user", "content": prompt}],
     )
-    return resp.choices[0].message["content"].strip()
+    message = resp.choices[0].message
+    content = message.content
+    if isinstance(content, list):
+        text_parts = []
+        for part in content:
+            if hasattr(part, "text"):
+                text_parts.append(part.text)
+            elif isinstance(part, dict) and "text" in part:
+                text_parts.append(part["text"])
+        content = "".join(text_parts)
+    elif content is None:
+        content = ""
+    return str(content).strip()
 
 
 def tts(text: str) -> bytes:
